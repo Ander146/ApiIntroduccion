@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Usuario</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+        input, button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        /* Desde aqui implentamos el css para la estetica de nuestra pagina web */
+
+    </style>
+</head>
+<body>
+
+    <h2>Registrar Usuario</h2>
+
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="text" id="usuario" placeholder="Usuario" required>
+    <input type="password" id="contrasena" placeholder="Contraseña" required>
+    <button onclick="guardarUsuario()">Guardar</button>
+
+    <p id="respuesta"></p>
+
+    <script>
+        function guardarUsuario() {
+            const nombre = document.getElementById('nombre').value;
+            const usuario = document.getElementById('usuario').value;
+            const contrasena = document.getElementById('contrasena').value;
+
+            if (!nombre || !usuario || !contrasena) {
+                document.getElementById("respuesta").innerText = "Todos los campos son obligatorios.";
+                return;
+            }
+
+            const datos = new URLSearchParams();
+            datos.append("nombre", nombre);
+            datos.append("usuario", usuario);
+            datos.append("contrasena", contrasena);
+
+            fetch("http://localhost/api/insertar_usuario.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: datos
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.trim() === "OK") {
+                    document.getElementById("respuesta").innerText = "Usuario guardado correctamente.";
+                    // Limpiar campos
+                    document.getElementById("nombre").value = "";
+                    document.getElementById("usuario").value = "";
+                    document.getElementById("contrasena").value = "";
+                } else {
+                    document.getElementById("respuesta").innerText = "Error: " + data;
+                }
+            })
+            .catch(error => {
+                document.getElementById("respuesta").innerText = "Error al enviar datos.";
+                console.error("Error:", error);
+            });
+        }
+    </script>
+
+</body>
+</html>
